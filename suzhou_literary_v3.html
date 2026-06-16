@@ -1,0 +1,1264 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<title>貓走過的腳印 — 文青版訪談雜誌</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@200;300;400;500;600;700&family=Noto+Sans+TC:wght@300;400;500&family=Ma+Shan+Zheng&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=ZCOOL+XiaoWei&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    background: #e6e1d4;
+    font-family: 'Noto Serif TC', serif;
+    color: #2a2620;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* === 杂志容器 === */
+  .magazine {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 30px 20px 60px 20px;
+    gap: 30px;
+  }
+
+  /* === 单页 250×350mm === */
+  .page {
+    width: 250mm;
+    height: 350mm;
+    aspect-ratio: 250 / 350;
+    background: #f5f1e8;
+    position: relative;
+    overflow: hidden;
+    box-shadow:
+      0 2px 4px rgba(0,0,0,0.08),
+      0 8px 24px rgba(0,0,0,0.12),
+      0 0 0 1px rgba(42,38,32,0.04);
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* === 通用 === */
+  .serif { font-family: 'Noto Serif TC', serif; }
+  .sans { font-family: 'Noto Sans TC', sans-serif; }
+  .hand { font-family: 'Ma Shan Zheng', cursive; }
+  .small-caps { font-family: 'Cormorant Garamond', serif; font-style: italic; letter-spacing: 2px; }
+  .em-green { color: #5a6b48; }
+  .em-orange { color: #b86a3a; }
+  .em-ink { color: #2a2620; }
+
+  /* === 纸纹底（用 CSS 模拟） === */
+  .page::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse at 20% 30%, rgba(184,106,58,0.04) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 70%, rgba(90,107,72,0.04) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  /* === 装饰小元素 === */
+  .corner-mark {
+    position: absolute;
+    width: 20mm;
+    height: 20mm;
+    border: 0.5px solid #8a8275;
+    opacity: 0.3;
+    z-index: 2;
+  }
+  .corner-mark.tl { top: 8mm; left: 8mm; border-right: none; border-bottom: none; }
+  .corner-mark.br { bottom: 8mm; right: 8mm; border-left: none; border-top: none; }
+
+  .page-no {
+    position: absolute;
+    bottom: 6mm;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 9pt;
+    color: #8a8275;
+    letter-spacing: 4px;
+    z-index: 3;
+  }
+
+  .header-tag {
+    position: absolute;
+    top: 10mm;
+    right: 14mm;
+    z-index: 3;
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 8.5pt;
+    color: #8a8275;
+    letter-spacing: 3px;
+    text-align: right;
+    line-height: 1.6;
+  }
+  .header-tag .ch {
+    font-family: 'Noto Serif TC', serif;
+    font-style: normal;
+    font-size: 10pt;
+    color: #5a6b48;
+    letter-spacing: 6px;
+  }
+
+  .stamp {
+    position: absolute;
+    z-index: 4;
+    border: 1.5px solid #b8332b;
+    color: #b8332b;
+    background: rgba(245,241,232,0.7);
+    font-family: 'Ma Shan Zheng', cursive;
+    text-align: center;
+    line-height: 1.1;
+    letter-spacing: 1px;
+    padding: 2mm 3mm;
+  }
+
+  /* =========================================
+     P1 - 封面 + 序言（黄墙僧人图）
+     ========================================= */
+  .p1 .photo-main {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 52%;
+    height: 100%;
+    z-index: 1;
+  }
+  .p1 .photo-main img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    /* 不加阴影/边框，让照片融入 */
+  }
+  .p1 .photo-main::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to right, rgba(245,241,232,0.5) 0%, transparent 18%);
+    pointer-events: none;
+  }
+
+  .p1 .title-block {
+    position: relative;
+    z-index: 3;
+    padding: 22mm 14mm 0 14mm;
+    width: 38%;
+  }
+  .p1 .title-en {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 11pt;
+    color: #8a8275;
+    letter-spacing: 5px;
+    margin-bottom: 6mm;
+  }
+  .p1 .title-en::before {
+    content: '';
+    display: inline-block;
+    width: 30px;
+    height: 1px;
+    background: #8a8275;
+    vertical-align: middle;
+    margin-right: 10px;
+  }
+  .p1 .title-zh {
+    font-family: 'Noto Serif TC', serif;
+    font-weight: 300;
+    font-size: 34pt;
+    line-height: 1.2;
+    color: #2a2620;
+    letter-spacing: 6px;
+    margin-bottom: 4mm;
+  }
+  .p1 .title-zh .paw {
+    color: #b86a3a;
+    font-size: 24pt;
+    margin-right: 2px;
+  }
+  .p1 .title-sub {
+    font-family: 'Noto Serif TC', serif;
+    font-weight: 400;
+    font-size: 12pt;
+    color: #5a6b48;
+    letter-spacing: 4px;
+    margin-bottom: 10mm;
+  }
+  .p1 .title-meta {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 9pt;
+    color: #8a8275;
+    letter-spacing: 3px;
+    border-top: 0.5px solid #8a8275;
+    padding-top: 4mm;
+    width: 95%;
+  }
+  .p1 .title-meta div { margin: 1.5mm 0; }
+
+  .p1 .prelude {
+    position: absolute;
+    bottom: 26mm;
+    left: 14mm;
+    width: 38%;
+    z-index: 3;
+    font-family: 'Noto Serif TC', serif;
+    font-weight: 300;
+    font-size: 12.5pt;
+    line-height: 2;
+    color: #3a3530;
+    text-align: justify;
+  }
+  .p1 .prelude .first-letter {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 38pt;
+    float: left;
+    line-height: 0.9;
+    padding: 4pt 6pt 0 0;
+    color: #b86a3a;
+  }
+  .p1 .prelude .em {
+    color: #5a6b48;
+    border-bottom: 1px solid rgba(90,107,72,0.3);
+    padding-bottom: 1pt;
+  }
+
+  .p1 .stamp1 {
+    bottom: 30mm;
+    right: 100mm;
+    width: 24mm;
+    height: 24mm;
+    transform: rotate(-6deg);
+    font-size: 14pt;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    border-width: 2px;
+  }
+
+  /* =========================================
+     P2 - 小迪·掌舵的人（橘猫图）
+     ========================================= */
+  .p2 .photo-side {
+    position: absolute;
+    top: 18mm;
+    right: 14mm;
+    width: 50%;
+    height: 65%;
+    z-index: 1;
+  }
+  .p2 .photo-side img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .p2 .photo-side::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to bottom,
+      transparent 50%,
+      rgba(42,38,32,0.55) 100%
+    );
+    pointer-events: none;
+  }
+
+  .p2 .content {
+    position: absolute;
+    top: 18mm;
+    left: 14mm;
+    width: 38%;
+    bottom: 18mm;
+    z-index: 3;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+  }
+  .p2 .num {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 60pt;
+    color: #b86a3a;
+    line-height: 0.8;
+    margin-bottom: 4mm;
+  }
+  .p2 .name {
+    font-family: 'Noto Serif TC', serif;
+    font-weight: 500;
+    font-size: 24pt;
+    color: #2a2620;
+    letter-spacing: 8px;
+    margin-bottom: 2mm;
+  }
+  .p2 .role {
+    font-family: 'Noto Serif TC', serif;
+    font-weight: 300;
+    font-size: 10.5pt;
+    color: #5a6b48;
+    letter-spacing: 5px;
+    margin-bottom: 6mm;
+    padding-bottom: 4mm;
+    border-bottom: 0.5px solid #8a8275;
+  }
+  .p2 .lede {
+    font-family: 'Noto Serif TC', serif;
+    font-weight: 300;
+    font-size: 12pt;
+    line-height: 2;
+    color: #3a3530;
+    margin-bottom: 5mm;
+    text-align: justify;
+  }
+  .p2 .quote {
+    font-family: 'Noto Serif TC', serif;
+    font-weight: 300;
+    font-size: 11.5pt;
+    line-height: 1.95;
+    color: #4a453e;
+    flex: 1;
+    text-align: justify;
+    margin-top: 4mm;
+  }
+  .p2 .quote .q {
+    color: #5a6b48;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 15pt;
+    line-height: 0;
+    vertical-align: -3pt;
+    margin: 0 1pt;
+  }
+  .p2 .quote .hl {
+    background: linear-gradient(transparent 70%, rgba(184,106,58,0.2) 70%);
+    padding: 0 2pt;
+  }
+
+  .p2 .caption {
+    position: absolute;
+    bottom: 14mm;
+    right: 18mm;
+    width: auto;
+    max-width: 38%;
+    z-index: 4;
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 11pt;
+    color: #f5f1e8;
+    text-align: right;
+    letter-spacing: 2px;
+    line-height: 1.5;
+    border-right: 1px solid #f5f1e8;
+    padding-right: 4mm;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.4);
+  }
+
+  .p2 .bottom-text {
+    position: relative;
+    width: 100%;
+    margin-top: 4mm;
+    font-family: 'Noto Serif TC', serif;
+    font-weight: 300;
+    font-size: 11pt;
+    line-height: 1.95;
+    color: #4a453e;
+    text-align: justify;
+  }
+  .p2 .bottom-text .em {
+    color: #5a6b48;
+    font-weight: 400;
+  }
+
+  /* =========================================
+     P3 - 小美·把故事排成風景的人（左圖右文）
+     ========================================= */
+  .p3 .photo-left {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 52%;
+    height: 100%;
+    z-index: 1;
+  }
+  .p3 .photo-left img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .p3 .photo-left::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to right, transparent 70%, rgba(245,241,232,0.4) 100%);
+    pointer-events: none;
+  }
+
+  .p3 .text-right {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 48%;
+    height: 100%;
+    z-index: 3;
+    padding: 22mm 16mm 22mm 14mm;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .p3 .header-mini {
+    margin-bottom: 5mm;
+  }
+  .p3 .num {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 56pt;
+    color: #b86a3a;
+    line-height: 0.8;
+    margin-bottom: 3mm;
+  }
+  .p3 .name {
+    font-family: 'Noto Serif TC', serif;
+    font-weight: 500;
+    font-size: 26pt;
+    color: #2a2620;
+    letter-spacing: 8px;
+    margin-bottom: 2mm;
+  }
+  .p3 .role {
+    font-family: 'Noto Serif TC', serif;
+    font-weight: 300;
+    font-size: 11pt;
+    color: #5a6b48;
+    letter-spacing: 5px;
+    margin-bottom: 5mm;
+    padding-bottom: 3mm;
+    border-bottom: 0.5px solid #8a8275;
+  }
+  .p3 .en-pull {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 11pt;
+    color: #8a8275;
+    line-height: 1.5;
+    margin-bottom: 4mm;
+  }
+
+  .p3 .stat {
+    font-family: 'Noto Serif TC', serif;
+    font-weight: 200;
+    font-size: 11pt;
+    color: #4a453e;
+    line-height: 1.7;
+    margin-bottom: 5mm;
+    display: flex;
+    gap: 6mm;
+    align-items: baseline;
+  }
+  .p3 .stat .item {
+    display: flex;
+    flex-direction: column;
+  }
+  .p3 .stat .big {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 32pt;
+    font-weight: 400;
+    color: #b86a3a;
+    line-height: 1;
+    margin-bottom: 1mm;
+  }
+  .p3 .stat .label {
+    font-size: 9.5pt;
+    color: #8a8275;
+    letter-spacing: 3px;
+  }
+
+  .p3 .text-block {
+    font-family: 'Noto Serif TC', serif;
+    font-weight: 300;
+    font-size: 12pt;
+    line-height: 2.05;
+    color: #4a453e;
+    text-align: justify;
+  }
+  .p3 .text-block p { margin-bottom: 3.5mm; }
+  .p3 .text-block .q {
+    color: #5a6b48;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 15pt;
+    line-height: 0;
+    vertical-align: -3pt;
+    margin: 0 1pt;
+  }
+  .p3 .text-block .em {
+    color: #5a6b48;
+    font-weight: 400;
+    border-bottom: 1px dotted #5a6b48;
+  }
+  .p3 .text-block .hl {
+    background: linear-gradient(transparent 70%, rgba(184,106,58,0.2) 70%);
+    padding: 0 2pt;
+  }
+
+  .p3 .quote-callout {
+    font-family: 'Noto Serif TC', serif;
+    font-weight: 200;
+    font-size: 12.5pt;
+    line-height: 1.75;
+    color: #3a3530;
+    text-align: left;
+    border-left: 3px solid #b86a3a;
+    padding: 2mm 0 2mm 5mm;
+    margin: 3mm 0;
+  }
+  .p3 .quote-callout .q {
+    color: #b86a3a;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 16pt;
+  }
+
+  .p3 .sign-mini {
+    margin-top: auto;
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 9.5pt;
+    color: #8a8275;
+    letter-spacing: 3px;
+    border-top: 0.5px solid #8a8275;
+    padding-top: 3mm;
+  }
+  .p3 .sign-mini .ch {
+    font-family: 'Noto Serif TC', serif;
+    font-style: normal;
+    font-size: 10.5pt;
+    color: #2a2620;
+    letter-spacing: 4px;
+  }
+
+  .p3 .stamp {
+    bottom: 22mm;
+    right: 22mm;
+    width: 22mm;
+    height: 22mm;
+    transform: rotate(-4deg);
+    font-size: 12pt;
+    line-height: 1.05;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .p3 .corner-deco {
+    position: absolute;
+    top: 18mm;
+    right: 18mm;
+    z-index: 3;
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 10pt;
+    color: #8a8275;
+    text-align: right;
+    letter-spacing: 3px;
+  }
+
+  /* =========================================
+     P4 - 小馬·最後把關的人（上圖下文）
+     ========================================= */
+  .p4 {
+    background: #efe9db !important;
+  }
+
+  .p4 .photo-top {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 32%;
+    z-index: 1;
+  }
+  .p4 .photo-top img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 50% 60%;
+  }
+  .p4 .photo-top::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to bottom, transparent 60%, rgba(239,233,219,0.4) 100%);
+    pointer-events: none;
+  }
+  .p4 .photo-label {
+    position: absolute;
+    top: 12mm;
+    left: 18mm;
+    z-index: 4;
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 10pt;
+    color: #f5f1e8;
+    background: rgba(42,38,32,0.5);
+    padding: 2mm 4mm;
+    letter-spacing: 3px;
+  }
+
+  .p4 .content {
+    position: absolute;
+    top: 32%;
+    left: 0;
+    width: 100%;
+    bottom: 0;
+    background: #efe9db;
+    z-index: 3;
+    padding: 14mm 22mm 18mm 22mm;
+    display: flex;
+    flex-direction: column;
+  }
+  .p4 .header {
+    text-align: center;
+    margin-bottom: 5mm;
+  }
+  .p4 .header .num {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 32pt;
+    color: #b86a3a;
+    line-height: 1;
+  }
+  .p4 .header .divider {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6mm;
+    margin: 2mm 0 3mm 0;
+  }
+  .p4 .header .divider .line {
+    width: 24mm;
+    height: 0.5px;
+    background: #8a8275;
+  }
+  .p4 .header .divider .dot {
+    width: 4pt;
+    height: 4pt;
+    background: #b86a3a;
+    transform: rotate(45deg);
+  }
+  .p4 .header .name {
+    font-family: 'Noto Serif TC', serif;
+    font-weight: 500;
+    font-size: 22pt;
+    color: #2a2620;
+    letter-spacing: 12px;
+    margin-bottom: 1mm;
+  }
+  .p4 .header .role {
+    font-family: 'Noto Serif TC', serif;
+    font-weight: 300;
+    font-size: 10.5pt;
+    color: #5a6b48;
+    letter-spacing: 6px;
+  }
+  .p4 .lede {
+    text-align: center;
+    font-family: 'Noto Serif TC', serif;
+    font-weight: 300;
+    font-size: 12.5pt;
+    line-height: 1.9;
+    color: #4a453e;
+    margin: 4mm auto 5mm auto;
+    max-width: 170mm;
+  }
+  .p4 .lede .em {
+    color: #5a6b48;
+    font-weight: 400;
+  }
+  .p4 .quote {
+    flex: 1;
+    font-family: 'Noto Serif TC', serif;
+    font-weight: 300;
+    font-size: 12pt;
+    line-height: 2.05;
+    color: #4a453e;
+    text-align: justify;
+    columns: 2;
+    column-gap: 10mm;
+  }
+  .p4 .quote p { margin-bottom: 3mm; }
+  .p4 .quote .q {
+    color: #5a6b48;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 15pt;
+    line-height: 0;
+    vertical-align: -3pt;
+    margin: 0 1pt;
+  }
+  .p4 .quote .hl {
+    background: linear-gradient(transparent 70%, rgba(184,106,58,0.2) 70%);
+    padding: 0 2pt;
+  }
+  .p4 .bottom-line {
+    border-top: 0.5px solid #8a8275;
+    margin-top: 5mm;
+    padding-top: 3mm;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .p4 .bottom-line .left {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 8.5pt;
+    color: #8a8275;
+    letter-spacing: 3px;
+  }
+  .p4 .bottom-line .right {
+    font-family: 'Ma Shan Zheng', cursive;
+    font-size: 11pt;
+    color: #b8332b;
+  }
+  .p4 .paw-bg {
+    position: absolute;
+    bottom: 20mm;
+    left: 16mm;
+    font-size: 80pt;
+    color: rgba(184,106,58,0.06);
+    z-index: 1;
+  }
+
+  /* =========================================
+     P5 - 小清·寫字的人（左文右圖）
+     ========================================= */
+  .p5 {
+    background: #f5f1e8 !important;
+  }
+  .p5 .deco-line {
+    position: absolute;
+    background: #8a8275;
+    opacity: 0.25;
+    z-index: 1;
+  }
+  .p5 .deco-line.v1 { left: 16mm; top: 0; bottom: 0; width: 0.5px; }
+  .p5 .deco-line.v2 { right: 16mm; top: 0; bottom: 0; width: 0.5px; }
+  .p5 .deco-corner {
+    position: absolute;
+    z-index: 1;
+    width: 14mm;
+    height: 14mm;
+    border: 0.5px solid #8a8275;
+    opacity: 0.3;
+  }
+  .p5 .deco-corner.tl { top: 14mm; left: 14mm; border-right: none; border-bottom: none; }
+  .p5 .deco-corner.br { bottom: 14mm; right: 14mm; border-left: none; border-top: none; }
+  .p5 .deco-paw {
+    position: absolute;
+    z-index: 1;
+    color: rgba(184,106,58,0.08);
+    font-size: 50pt;
+  }
+  .p5 .deco-paw.p1 { top: 26mm; left: 22mm; }
+  .p5 .deco-paw.p2 { bottom: 30mm; left: 22mm; font-size: 36pt; }
+
+  .p5 .layout {
+    position: relative;
+    z-index: 3;
+    width: 100%;
+    height: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+  .p5 .text-side {
+    padding: 22mm 16mm 22mm 22mm;
+    display: flex;
+    flex-direction: column;
+  }
+  .p5 .photo-side {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+  }
+  .p5 .photo-side img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .p5 .photo-side::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to left, transparent 75%, rgba(245,241,232,0.35) 100%);
+    pointer-events: none;
+  }
+  .p5 .photo-label {
+    position: absolute;
+    top: 14mm;
+    right: 18mm;
+    z-index: 4;
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 10pt;
+    color: #f5f1e8;
+    background: rgba(42,38,32,0.5);
+    padding: 2mm 4mm;
+    letter-spacing: 3px;
+  }
+
+  .p5 .header {
+    text-align: left;
+    margin-bottom: 6mm;
+  }
+  .p5 .header .num {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 36pt;
+    color: #b86a3a;
+    line-height: 1;
+  }
+  .p5 .header .name {
+    font-family: 'Noto Serif TC', serif;
+    font-weight: 500;
+    font-size: 24pt;
+    color: #2a2620;
+    letter-spacing: 12px;
+    margin: 2mm 0;
+  }
+  .p5 .header .role {
+    font-family: 'Noto Serif TC', serif;
+    font-weight: 300;
+    font-size: 11pt;
+    color: #5a6b48;
+    letter-spacing: 6px;
+  }
+  .p5 .handwrite {
+    font-family: 'Ma Shan Zheng', cursive;
+    font-size: 19pt;
+    line-height: 1.85;
+    color: #3a3530;
+    text-align: justify;
+    margin: 4mm 0 6mm 0;
+  }
+  .p5 .handwrite .q {
+    color: #b86a3a;
+    font-size: 22pt;
+  }
+  .p5 .handwrite .em {
+    color: #5a6b48;
+  }
+  .p5 .body {
+    flex: 1;
+    font-family: 'Noto Serif TC', serif;
+    font-weight: 300;
+    font-size: 11.5pt;
+    line-height: 2.05;
+    color: #4a453e;
+    text-align: justify;
+  }
+  .p5 .body p { margin-bottom: 3mm; }
+  .p5 .body .em {
+    color: #5a6b48;
+    font-weight: 400;
+  }
+  .p5 .footer {
+    border-top: 0.5px solid #8a8275;
+    padding-top: 3mm;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+  }
+  .p5 .footer .left {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 9pt;
+    color: #8a8275;
+    letter-spacing: 3px;
+  }
+  .p5 .footer .right {
+    font-family: 'Ma Shan Zheng', cursive;
+    font-size: 10.5pt;
+    color: #5a6b48;
+  }
+
+  /* =========================================
+     P6 - 尾聲（单图hero+结尾句）
+     ========================================= */
+  .p6 .hero-photo {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 50%;
+    z-index: 1;
+  }
+  .p6 .hero-photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 50% 50%;
+  }
+  .p6 .hero-photo::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to bottom, transparent 60%, rgba(245,241,232,0.35) 100%);
+    pointer-events: none;
+  }
+  .p6 .hero-label {
+    position: absolute;
+    top: 14mm;
+    left: 18mm;
+    z-index: 3;
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 10pt;
+    color: #f5f1e8;
+    background: rgba(42,38,32,0.5);
+    padding: 2mm 4mm;
+    letter-spacing: 3px;
+  }
+  .p6 .content {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 58%;
+    padding: 8mm 22mm 22mm 22mm;
+    z-index: 3;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  .p6 .end-title {
+    font-family: 'Noto Serif TC', serif;
+    font-weight: 500;
+    font-size: 22pt;
+    color: #2a2620;
+    letter-spacing: 10px;
+    margin-bottom: 4mm;
+  }
+  .p6 .end-title-en {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 10pt;
+    color: #8a8275;
+    letter-spacing: 4px;
+    margin-bottom: 8mm;
+  }
+  .p6 .end-body {
+    font-family: 'Noto Serif TC', serif;
+    font-weight: 300;
+    font-size: 12pt;
+    line-height: 2.05;
+    color: #4a453e;
+    text-align: center;
+    max-width: 170mm;
+  }
+  .p6 .end-body p { margin-bottom: 2mm; }
+  .p6 .end-body .em {
+    color: #5a6b48;
+    font-weight: 400;
+  }
+  .p6 .end-quote {
+    font-family: 'Ma Shan Zheng', cursive;
+    font-size: 20pt;
+    color: #b8332b;
+    margin: 6mm 0 4mm 0;
+    letter-spacing: 4px;
+    line-height: 1.5;
+  }
+  .p6 .sign {
+    margin-top: auto;
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 8.5pt;
+    color: #8a8275;
+    letter-spacing: 3px;
+    border-top: 0.5px solid #8a8275;
+    padding-top: 3mm;
+    width: 100%;
+  }
+  .p6 .sign .ch {
+    font-family: 'Noto Serif TC', serif;
+    font-style: normal;
+    font-size: 10pt;
+    color: #2a2620;
+    letter-spacing: 4px;
+  }
+
+</style>
+</head>
+<body>
+
+<div class="magazine">
+
+  <!-- ============= P1 封面 + 序言 ============= -->
+  <div class="page p1">
+    <div class="corner-mark tl"></div>
+    <div class="corner-mark br"></div>
+    <div class="header-tag">
+      <div class="ch">貓 · 走 · 過</div>
+      <div>SUZHOU DIARY</div>
+      <div>VOL.01 · 2026.05</div>
+    </div>
+
+    <div class="photo-main">
+      <img src="https://www.coze.cn/s/8E3NIneKj1o/" alt="黃牆下的相遇">
+    </div>
+
+    <div class="title-block">
+      <div class="title-en">Footprints of <br>a Passing Cat</div>
+      <div class="title-zh"><span class="paw">🐾</span>貓走過<br>的腳印</div>
+      <div class="title-sub">——記一次蘇州之旅，<br>&nbsp;&nbsp;與四個人的聲音</div>
+      <div class="title-meta">
+        <div>SUZHOU · MAY 2026</div>
+        <div>PHOTOGRAPHY · 老迪</div>
+        <div>WRITING · 小清</div>
+        <div>DESIGN · 小美</div>
+      </div>
+    </div>
+
+    <div class="prelude">
+      <span class="first-letter">專</span>案結束的那天，我把最後一行文字標上句點，忽然想起<span class="em">西園寺那隻貓</span>——<br><br>
+      牠臥在青石板上，<span class="em">僧人走過，遊客走過，牠都沒有動</span>。<br><br>
+      有那麼一刻，我覺得我們都像那隻貓，在這場名為「蘇州」的故事裡，各自安靜地佔著一個位置，然後，一起完成了什麼。
+    </div>
+
+    <div class="stamp stamp1">貓走<br>過的<br>腳印</div>
+
+    <div class="page-no">— 01 —</div>
+  </div>
+
+  <!-- ============= P2 小迪 ============= -->
+  <div class="page p2">
+    <div class="corner-mark tl"></div>
+    <div class="corner-mark br"></div>
+    <div class="header-tag">
+      <div class="ch">訪 談 · 壹</div>
+      <div>INTERVIEW N°1</div>
+    </div>
+
+    <div class="photo-side">
+      <img src="https://www.coze.cn/s/X8c-fLwllkk/" alt="岩石下沉睡的貓">
+    </div>
+
+    <div class="content">
+      <div class="num">N°1</div>
+      <div class="name">小 迪</div>
+      <div class="role">掌 舵 的 人</div>
+      <div class="lede">
+        「第一次帶這麼多人做一個完整的專案，」小迪說這話的時候，語氣裡還有點不可思議。
+      </div>
+      <div class="quote">
+        <p>做為總負責人，他是那個把大家的節奏兜在一起的人。照片要整理、文案要對照片、排版要對文案、最後還要部署上線——<span class="hl">一環扣一環</span>，哪個環節慢了，後面的人都得等。</p>
+        <p>他說最大的收穫，是看見了「一個想法從零變成看得見的網頁」的全過程。<span class="q">「</span>以前總覺得旅行筆記就是拍拍照寫寫字，現在才知道，字要擺在哪裡、照片要裁成什麼比例、標題用什麼字體、行距多少才舒服——<span class="hl">這些看不見的細節，加起來就是一個作品的溫度</span>。<span class="q">」</span></p>
+
+        <div class="bottom-text">
+          給老迪的建議？他想了想，認真地說：<span class="em">「下次出門玩，能不能多寫點筆記？很多細節你當時覺得沒什麼，事後寫文案的時候才發現是寶。」</span>他停了一下，又補了一句：「不過話說回來，<span class="em">正是因為你沒寫，我們才有了更多想像空間</span>——也說不定。」
+        </div>
+      </div>
+    </div>
+
+    <div class="caption">
+      像一隻沉穩的貓，<br>看著船，慢慢開。
+    </div>
+
+    <div class="page-no">— 02 —</div>
+  </div>
+
+  <!-- ============= P3 小美（左圖右文） ============= -->
+  <div class="page p3">
+    <div class="corner-mark tl"></div>
+    <div class="corner-mark br"></div>
+    <div class="header-tag">
+      <div class="ch">訪 談 · 貳</div>
+      <div>INTERVIEW N°2</div>
+    </div>
+
+    <div class="photo-left">
+      <img src="https://www.coze.cn/s/AvNzFRcQg9I/" alt="蘇州博物館倒影">
+    </div>
+
+    <div class="text-right">
+      <div class="header-mini">
+        <div class="num">N°2</div>
+        <div class="name">小 美</div>
+        <div class="role">把 故 事 排 成 風 景 的 人</div>
+        <div class="en-pull">
+          "Layout is the silent<br>
+          language of photography."
+        </div>
+      </div>
+
+      <div class="stat">
+        <div class="item">
+          <span class="big">12pt</span>
+          <span class="label">行 距 講 究</span>
+        </div>
+        <div class="item">
+          <span class="big">1px</span>
+          <span class="label">基 線 偏 差</span>
+        </div>
+        <div class="item">
+          <span class="big">0%</span>
+          <span class="label">浮 框 寬 容</span>
+        </div>
+      </div>
+
+      <div class="text-block">
+        <p>小美是最安靜的那個。大部分時候她都在默默調整照片的邊框、對齊文字的基線。</p>
+
+        <p><span class="q">「</span>這是我第一次做旅行主題的網頁排版，<span class="q">」</span>她說，<span class="em">以前做的都是產品頁、活動頁</span>，講究資訊清晰、重點突出。但旅行筆記不一樣——它要慢、要鬆、要能讓人一頁一頁翻下去，像真的在走路一樣。</p>
+      </div>
+
+      <div class="quote-callout">
+        <span class="q">「</span>白貓和童車並排那頁，我調了很久的比例。<span class="em">一定要讓讀者看到兩張照片並置的時候，心裡會輕輕『啊』一聲</span>。」
+      </div>
+
+      <div class="text-block">
+        <p>對老迪的建議？她眼睛亮了起來：<span class="hl">「可以多拍一點細節嗎？地上的落葉、牆上的苔蘚、茶杯的蒸氣——這些小東西，是最能讓人有感覺的。」</span></p>
+      </div>
+
+      <div class="sign-mini">
+        <span class="ch">— 排版即風景 · 小美手記 —</span>
+      </div>
+    </div>
+
+    <div class="stamp">美就<br>對了</div>
+
+    <div class="page-no">— 03 —</div>
+  </div>
+
+  <!-- ============= P4 小馬（上圖下文） ============= -->
+  <div class="page p4">
+    <div class="corner-mark tl"></div>
+    <div class="corner-mark br"></div>
+    <div class="paw-bg">🐾</div>
+
+    <div class="photo-top">
+      <img src="https://www.coze.cn/s/AIuEzwabyFg/" alt="楓橋上的行人">
+    </div>
+    <div class="photo-label">N°3 · 楓 橋 · 過 客</div>
+
+    <div class="content">
+      <div class="header">
+        <div class="num">N°3</div>
+        <div class="divider">
+          <div class="line"></div>
+          <div class="dot"></div>
+          <div class="line"></div>
+        </div>
+        <div class="name">小 馬</div>
+        <div class="role">最 後 把 關 的 人</div>
+      </div>
+
+      <div class="lede">
+        小馬是<span class="em">中途加入</span>的，那時候專案已經進行了一大半。他的角色是內容審核，負責把關<span class="em">真實性、確認沒有錯誤</span>。
+      </div>
+
+      <div class="quote">
+        <p><span class="q">「</span>我其實一開始有點擔心，<span class="q">」</span>他坦言，旅行筆記難免會有一些藝術加工。但老迪很堅持真實，這點<span class="hl">我很佩服</span>。</p>
+
+        <p>他說最大的收穫，是重新理解了「真實」和「創作」之間的界線。<span class="q">「</span>不是說不能加工，而是加工的時候，<span class="hl">要知道哪裡是真的、哪裡是修飾的</span>。<span class="q">」</span></p>
+
+        <p>對老迪的建議？<span class="q">「</span>希望下次旅行的時候，可以記一下每天的行程，不用太詳細，幾個關鍵字就好。比如<span class="hl">『上午拙政園，人很多，有個亭子很舒服』</span>。<span class="q">」</span></p>
+
+        <p>還有啊，<span class="q">「</span><span class="hl">松子糖那個故事很棒</span>。多一點這種真人真事的小故事，比任何華麗的辭藻都動人。<span class="q">」</span></p>
+      </div>
+
+      <div class="bottom-line">
+        <div class="left">" TRUTH IS THE BASELINE "</div>
+        <div class="right">真實 · 底線 · 最動人</div>
+      </div>
+    </div>
+
+    <div class="page-no">— 04 —</div>
+  </div>
+
+  <!-- ============= P5 小清（左文右圖） ============= -->
+  <div class="page p5">
+    <div class="deco-line v1"></div>
+    <div class="deco-line v2"></div>
+    <div class="deco-corner tl"></div>
+    <div class="deco-corner br"></div>
+    <div class="deco-paw p1">🐾</div>
+    <div class="deco-paw p2">🐾</div>
+
+    <div class="layout">
+      <div class="text-side">
+        <div class="header">
+          <div class="num">N°4</div>
+          <div class="name">小 清</div>
+          <div class="role">寫 字 的 人</div>
+        </div>
+
+        <div class="handwrite">
+          <span class="q">「</span>原來好的旅行文學，<br>
+          不是寫你去了哪裡，<br>
+          是寫你在那裡，<span class="em">感受到了什麼</span>。」
+        </div>
+
+        <div class="body">
+          <p>至於我自己呢？想起第一天接這個案子的時候，心裡其實很忐忑。一堆照片、一個「貓」的意象，要把它們串成一個說得通的故事——說起來容易，做起來難。</p>
+
+          <p>但後來我發現，最棒的故事從來不是編出來的，是從照片裡<span class="em">「看出來」</span>的。看那隻貓的姿態、看僧人走過的腳步、看楓橋邊的夕陽、看一碗螺螄粉冒著的熱氣——這些畫面本身就在說話，我只是把它們翻譯成文字而已。</p>
+
+          <p>給老迪的建議？我想了很久。<span class="em">「下次旅行，帶個小本子吧。不用寫很多，每天睡前寫三句話就好。今天印象最深的一個畫面、一個聲音、一個味道。這些東西，時間一久就會忘，但寫下來了，就是一輩子的。」</span></p>
+
+          <p>還有……我停了停，<span class="em">「下次再去什麼地方，還要找我們一起。一個人看風景，和四個人一起做一個關於風景的作品，感覺，真的不一樣。」</span></p>
+        </div>
+
+        <div class="footer">
+          <div class="left">— THE WRITER'S NOTE —</div>
+          <div class="right">小清 · 寫於蘇州歸來第十日</div>
+        </div>
+      </div>
+
+      <div class="photo-side">
+        <img src="https://www.coze.cn/s/bdY3jVP2cbY/" alt="黃昏城市天際線">
+        <div class="photo-label">N°4 · 黃 昏 · 蘇 州 港</div>
+      </div>
+    </div>
+
+    <div class="page-no">— 05 —</div>
+  </div>
+
+  <!-- ============= P6 尾声 ============= -->
+  <div class="page p6">
+    <div class="corner-mark tl"></div>
+    <div class="corner-mark br"></div>
+
+    <div class="hero-photo">
+      <img src="https://www.coze.cn/s/j_LFM9sDr6I/" alt="光影中伸懶腰的白貓">
+    </div>
+    <div class="hero-label">EPILOGUE · 光影 · 沉澱</div>
+
+    <div class="content">
+      <div class="end-title">尾 聲</div>
+      <div class="end-title-en">EPILOGUE · NOT AN ENDING, BUT A BEGINNING</div>
+
+      <div class="end-body">
+        <p>專案結束了，但蘇州的記憶還在。那些貓、那些園子、那些橋、那些船，都以某種方式留在了那個網頁裡，也留在了我們每個人心裡。</p>
+        <p>我們因為一場關於蘇州的旅行聚在一起，然後，又會因為下一個什麼故事，再次啟程。</p>
+        <p>像貓一樣，<span class="em">慢慢走，到處看看，遇見喜歡的風景，就多停留一會兒</span>。</p>
+      </div>
+
+      <div class="end-quote">
+        最好的風景從來不是用來抵達的，<br>
+        是用來——一起走過的。
+      </div>
+
+      <div class="sign">
+        <span class="ch">老迪 攝 · 小迪 編 · 小美 設計 · 小清 文 · 小馬 審</span><br>
+        SUZHOU · 2026.05.24 — 05.30
+      </div>
+    </div>
+
+    <div class="page-no">— 06 —</div>
+  </div>
+
+</div>
+
+</body>
+</html>
